@@ -3,6 +3,7 @@ const graphqlHTTP = require('express-graphql');
 const { buildSchema } = require('graphql');
 const expressPlayground = require('graphql-playground-middleware-express')
   .default;
+const mongoose = require('mongoose');
 
 const app = express();
 
@@ -76,6 +77,13 @@ app.get('/playground', expressPlayground({ endpoint: '/graphql' }));
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server up on port ${PORT}`);
-});
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log('Connected to database');
+
+    app.listen(PORT, () => {
+      console.log(`Server up on port ${PORT}`);
+    });
+  })
+  .catch(err => console.log(err));
