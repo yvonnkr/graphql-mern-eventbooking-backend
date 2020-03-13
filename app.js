@@ -75,10 +75,14 @@ app.use(
 //alt to graphiql --localhost:5000/playground   --npm i 'graphql-playground-middleware-express' then require as above
 app.get('/playground', expressPlayground({ endpoint: '/graphql' }));
 
+//connect to db then app.listen
 const PORT = process.env.PORT || 5000;
-
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true
+  })
   .then(() => {
     console.log('Connected to database');
 
