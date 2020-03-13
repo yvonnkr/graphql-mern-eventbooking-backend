@@ -5,17 +5,9 @@ const expressPlayground = require('graphql-playground-middleware-express')
   .default;
 const mongoose = require('mongoose');
 
-const app = express();
+const Event = require('./models/event');
 
-const events = [
-  {
-    _id: Math.random().toString(),
-    title: 'All-Night Coding',
-    description: 'Complete graphql course',
-    price: 149.99,
-    date: new Date().toISOString()
-  }
-];
+const app = express();
 
 //--alternative to using bodyParser --no need to install bodyParser express covers it
 app.use(express.json({ extended: false }));
@@ -55,17 +47,24 @@ app.use(
       },
       createEvent: args => {
         const { title, description, price, date } = args.eventInput;
-        const event = {
-          _id: Math.random().toString(),
+
+        const event = new Event({
           title,
           description,
           price,
-          date
-        };
+          date: new Date(date)
+        });
 
-        events.push(event);
-
-        return event;
+        return event
+          .save()
+          .then(result => {
+            console.log(result);
+            return { ...result._doc };
+          })
+          .catch(err => {
+            console.log(err);
+            throw err;
+          });
       }
     },
     graphiql: true //--localhost:5000/graphql
