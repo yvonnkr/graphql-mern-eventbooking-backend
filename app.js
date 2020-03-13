@@ -42,10 +42,16 @@ app.use(
          }
     `),
     rootValue: {
-      events: () => {
-        return events;
+      events: async () => {
+        try {
+          const events = await Event.find();
+          return events;
+        } catch (err) {
+          console.log(err);
+          throw err;
+        }
       },
-      createEvent: args => {
+      createEvent: async args => {
         const { title, description, price, date } = args.eventInput;
 
         const event = new Event({
@@ -55,23 +61,20 @@ app.use(
           date: new Date(date)
         });
 
-        return event
-          .save()
-          .then(result => {
-            console.log(result);
-            return { ...result._doc };
-          })
-          .catch(err => {
-            console.log(err);
-            throw err;
-          });
+        try {
+          const result = await event.save();
+          return result;
+        } catch (err) {
+          console.log(err);
+          throw err;
+        }
       }
     },
     graphiql: true //--localhost:5000/graphql
   })
 );
 
-//alt to graphiql --localhost:5000/playground   --npm i 'graphql-playground-middleware-express' then require as above
+//alt to graphiql --localhost:5000/playground   --npm i 'graphql-playground-middleware-express'
 app.get('/playground', expressPlayground({ endpoint: '/graphql' }));
 
 //connect to db then app.listen
@@ -80,6 +83,7 @@ mongoose
   .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useFindAndModify: false,
     useCreateIndex: true
   })
   .then(() => {
