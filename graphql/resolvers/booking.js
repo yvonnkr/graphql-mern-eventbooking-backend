@@ -4,7 +4,12 @@ const { transformBooking, transformEvent } = require('./merge-helpers');
 
 module.exports = {
   //query
-  bookings: async () => {
+  bookings: async (args, req) => {
+    //check auth
+    if (!req.isAuth) {
+      throw new Error('Unauthentication');
+    }
+
     try {
       const bookings = await Booking.find();
 
@@ -16,14 +21,19 @@ module.exports = {
     }
   },
   //mutation
-  bookEvent: async args => {
+  bookEvent: async (args, req) => {
+    //check auth
+    if (!req.isAuth) {
+      throw new Error('Unauthentication');
+    }
+
     try {
       const fetchedEvent = await Event.findById(args.eventId);
       if (!fetchedEvent) throw new Error('Event not found');
 
       const createdBooking = new Booking({
         event: fetchedEvent,
-        user: '5e6c02914dbf273fdca0233a'
+        user: req.userId
       });
 
       const result = await createdBooking.save();
@@ -34,7 +44,12 @@ module.exports = {
     }
   },
   //mutation
-  cancelBooking: async args => {
+  cancelBooking: async (args, req) => {
+    //check auth
+    if (!req.isAuth) {
+      throw new Error('Unauthentication');
+    }
+
     try {
       const booking = await Booking.findById(args.bookingId).populate('event');
       if (!booking) throw new Error('Booking not found');

@@ -1,18 +1,22 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const graphqlHTTP = require('express-graphql');
 const expressPlayground = require('graphql-playground-middleware-express')
   .default;
-const mongoose = require('mongoose');
 
 const graphqlSchema = require('./graphql/schema/index');
 const rootResolver = require('./graphql/resolvers/index');
+const isAuth = require('./middleware/is-auth');
 
 const app = express();
 
 //--alternative to using bodyParser --no need to install bodyParser express covers it
 app.use(express.json({ extended: false }));
 
-//simple schema/resolvers
+//is-auth middleware
+app.use(isAuth);
+
+//graphql
 app.use(
   '/graphql',
   graphqlHTTP({

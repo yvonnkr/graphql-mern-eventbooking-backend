@@ -18,7 +18,11 @@ module.exports = {
   },
 
   //mutation
-  createEvent: async args => {
+  createEvent: async (args, req) => {
+    //check auth
+    if (!req.isAuth) {
+      throw new Error('Unauthentication');
+    }
     const { title, description, price, date } = args.eventInput;
 
     const event = new Event({
@@ -26,14 +30,14 @@ module.exports = {
       description,
       price,
       date: new Date(date),
-      creator: '5e6c02914dbf273fdca0233a'
+      creator: req.userId
     });
 
     let createdEvent;
     try {
       const result = await event.save();
       createdEvent = transformEvent(result);
-      const creator = await User.findById('5e6c02914dbf273fdca0233a');
+      const creator = await User.findById(req.userId);
 
       if (!creator) {
         throw new Error('User not found.');
