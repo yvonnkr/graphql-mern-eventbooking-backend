@@ -5,7 +5,7 @@ const expressPlayground = require('graphql-playground-middleware-express')
 const mongoose = require('mongoose');
 
 const graphqlSchema = require('./graphql/schema/index');
-const graphqlResolvers = require('./graphql/resolvers/index');
+const rootResolver = require('./graphql/resolvers/index');
 
 const app = express();
 
@@ -17,7 +17,7 @@ app.use(
   '/graphql',
   graphqlHTTP({
     schema: graphqlSchema,
-    rootValue: graphqlResolvers,
+    rootValue: rootResolver,
     graphiql: true //--localhost:5000/graphql
   })
 );
