@@ -13,6 +13,21 @@ const app = express();
 //--alternative to using bodyParser --no need to install bodyParser express covers it
 app.use(express.json({ extended: false }));
 
+//Solve CORS error  --Cross-Origin-Resource-Sharing --blocks sharing data/resources from different domains
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-auth-token '
+  );
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 //is-auth middleware
 app.use(isAuth);
 
